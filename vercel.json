@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
+    }
+  ],
+  "env": {
+    "OPENROUTER_API_KEY": "@OPENROUTER_API_KEY",
+    "OPENROUTER_MODEL": "openai/gpt-4o-mini",
+    "APP_URL": "https://resume-analyser.vercel.app"
+  }
+}

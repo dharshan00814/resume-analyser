@@ -518,10 +518,22 @@
 			window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 		}
 
-		// Get API Base URL - works on localhost, mobile, and other devices
+		// Get API Base URL - smart routing for localhost, vercel, and other devices
 		const getApiUrl = (endpoint) => {
-			const protocol = window.location.protocol; // http: or https:
 			const hostname = window.location.hostname;
+			const protocol = window.location.protocol;
+			
+			// If on Vercel domain, use same domain
+			if (hostname.includes('vercel.app')) {
+				return `/api${endpoint.replace('/api', '')}`;
+			}
+			
+			// If on localhost, connect to local server
+			if (hostname === 'localhost' || hostname === '127.0.0.1') {
+				return `${protocol}//localhost:3000${endpoint}`;
+			}
+			
+			// For other devices on same network, use port 3000
 			const port = 3000;
 			return `${protocol}//${hostname}:${port}${endpoint}`;
 		};
