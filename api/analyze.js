@@ -122,7 +122,7 @@ function buildLocalAnalysis(resumeText, jobDesc = "") {
 }
 
 // Main handler
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -171,7 +171,7 @@ Return ONLY valid JSON with this exact structure:
   "gaps": string[],
   "interviewQuestions": string[],
   "summary": string
-}
+};
 
 Scoring rules:
 - overallScore is 0-100

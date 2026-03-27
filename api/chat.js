@@ -49,7 +49,7 @@ function buildLocalChatReply(message, resumeText = "") {
 }
 
 // Main handler
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -158,4 +158,4 @@ Guidelines:
   } catch (error) {
     res.status(500).json({ error: error.message || "Unexpected server error" });
   }
-}
+};
