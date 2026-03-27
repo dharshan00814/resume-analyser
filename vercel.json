@@ -20,10 +20,5 @@
       "dest": "/index.html",
       "status": 200
     }
-  ],
-  "env": {
-    "OPENROUTER_API_KEY": "@OPENROUTER_API_KEY",
-    "OPENROUTER_MODEL": "openai/gpt-4o-mini",
-    "APP_URL": "https://resume-analyser.vercel.app"
-  }
+  ]
 }
