@@ -4,6 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>🚀 AI Resume Screening System</title>
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
 	<style>
 		:root {
 			--bg-primary: #0a0e1f;
@@ -523,14 +524,14 @@
 			const hostname = window.location.hostname;
 			const protocol = window.location.protocol;
 			
-			// If on Vercel domain, use same domain
+			// If on Vercel domain, use same domain (Vercel serverless functions)
 			if (hostname.includes('vercel.app')) {
-				return `/api${endpoint.replace('/api', '')}`;
+				return endpoint; // Already /api/... path
 			}
 			
-			// If on localhost, connect to local server
+			// If on localhost, connect to local Express server on port 3000
 			if (hostname === 'localhost' || hostname === '127.0.0.1') {
-				return `${protocol}//localhost:3000${endpoint}`;
+				return `http://localhost:3000${endpoint}`;
 			}
 			
 			// For other devices on same network, use port 3000
