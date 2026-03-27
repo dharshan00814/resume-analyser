@@ -1,0 +1,16 @@
+{
+  "name": "ai-resume-screening-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Resume Screening System with OpenRouter backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.1"
+  }
+}

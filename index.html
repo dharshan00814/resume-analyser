@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>🚀 AI Resume Screening System</title>
+	<style>
+		:root {
+			--bg-primary: #0a0e1f;
+			--bg-secondary: #0f1629;
+			--glass-bg: rgba(15, 22, 41, 0.6);
+			--glass-border: rgba(78, 164, 255, 0.3);
+			--text-primary: #e6f0ff;
+			--text-secondary: #a8bedf;
+			--accent: #4ea4ff;
+			--accent-glow: #22c55e;
+			--neon-glow: 0 0 20px rgba(78, 164, 255, 0.6);
+			--shadow-neon: 0 20px 40px rgba(0, 20, 60, 0.5);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			font-family: 'Segoe UI', Inter, system-ui, sans-serif;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			overflow-x: hidden;
+			line-height: 1.6;
+		}
+
+		/* Particle Starfield */
+		#particles {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 1;
+		}
+
+		.particle {
+			position: absolute;
+			background: radial-gradient(circle, #4ea4ff22 0%, transparent 70%);
+			border-radius: 50%;
+			animation: float 20s infinite linear;
+		}
+
+		@keyframes float {
+			0% { transform: translateY(100vh) scale(0); opacity: 0; }
+			10% { opacity: 1; }
+			90% { opacity: 1; }
+			100% { transform: translateY(-100px) scale(1); opacity: 0; }
+		}
+
+		.container {
+			position: relative;
+			z-index: 10;
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem 1.5rem;
+		}
+
+		.hero {
+			text-align: center;
+			padding: 4rem 0;
+			animation: heroReveal 1.5s ease-out;
+		}
+
+		@keyframes heroReveal {
+			from { opacity: 0; transform: translateY(50px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.title {
+			font-size: clamp(2rem, 5vw, 3.5rem);
+			font-weight: 800;
+			background: linear-gradient(135deg, var(--accent), #22c55e, #f472b6);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin: 0 0 1rem;
+			animation: titleGlow 2s ease-in-out infinite alternate;
+		}
+
+		@keyframes titleGlow {
+			from { filter: drop-shadow(0 0 20px var(--accent)); }
+			to { filter: drop-shadow(0 0 30px var(--accent-glow)); }
+		}
+
+		.subtitle {
+			font-size: 1.3rem;
+			color: var(--text-secondary);
+			max-width: 600px;
+			margin: 0 auto 3rem;
+			opacity: 0;
+			animation: subtitleFade 1s ease-out 0.5s forwards;
+		}
+
+		@keyframes subtitleFade {
+			to { opacity: 1; }
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 2rem;
+			opacity: 0;
+			animation: gridStagger 1s ease-out 1s forwards;
+		}
+
+		@keyframes gridStagger {
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		@media (min-width: 900px) {
+			.grid { grid-template-columns: 1fr 1fr; }
+		}
+
+		.card {
+			background: var(--glass-bg);
+			backdrop-filter: blur(20px);
+			border: 1px solid var(--glass-border);
+			border-radius: 24px;
+			padding: 2.5rem;
+			box-shadow: var(--shadow-neon);
+			transform: translateY(50px);
+			opacity: 0;
+			transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		}
+
+		.card.animate { 
+			transform: translateY(0);
+			opacity: 1; 
+		}
+
+		.card:hover {
+			transform: translateY(-10px);
+			box-shadow: 0 30px 60px rgba(78, 164, 255, 0.3);
+			border-color: var(--accent);
+		}
+
+		label {
+			display: block;
+			margin-bottom: 0.75rem;
+			font-weight: 600;
+			color: var(--text-primary);
+			transition: all 0.3s ease;
+		}
+
+		.field {
+			margin-bottom: 2rem;
+			position: relative;
+		}
+
+		input, textarea, select {
+			width: 100%;
+			border: 2px solid transparent;
+			border-radius: 16px;
+			background: rgba(255,255,255,0.05);
+			color: var(--text-primary);
+			padding: 1rem 1.25rem;
+			font-size: 1rem;
+			outline: none;
+			transition: all 0.3s ease;
+		}
+
+		input:focus, textarea:focus, select:focus {
+			border-color: var(--accent);
+			box-shadow: var(--neon-glow);
+			background: rgba(255,255,255,0.08);
+			transform: scale(1.02);
+		}
+
+		textarea { min-height: 140px; resize: vertical; }
+
+		.btn {
+			position: relative;
+			border: none;
+			border-radius: 16px;
+			padding: 1rem 2rem;
+			font-weight: 600;
+			cursor: pointer;
+			overflow: hidden;
+			transition: all 0.3s ease;
+			font-size: 1rem;
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, var(--accent), #22c55e);
+			color: #000;
+		}
+
+		.btn-primary:hover:not(:disabled) {
+			transform: translateY(-3px) scale(1.05);
+			box-shadow: var(--neon-glow);
+		}
+
+		.btn-ripple {
+			background: rgba(255,255,255,0.1);
+			color: var(--text-primary);
+		}
+
+		.ripple {
+			position: absolute;
+			border-radius: 50%;
+			background: rgba(255,255,255,0.4);
+			transform: scale(0);
+			animation: ripple 0.6s linear;
+			pointer-events: none;
+		}
+
+		@keyframes ripple {
+			to { transform: scale(4); opacity: 0; }
+		}
+
+		.status {
+			padding: 1rem 1.25rem;
+			border-radius: 16px;
+			border: 1px solid var(--glass-border);
+			background: rgba(78, 164, 255, 0.1);
+			animation: statusSlide 0.4s ease-out;
+		}
+
+		@keyframes statusSlide {
+			from { transform: translateX(-100%); opacity: 0; }
+		}
+
+		/* Fit Meter from index_fixed */
+		.fit-meter {
+			background: rgba(255,255,255,0.05);
+			border-radius: 999px;
+			height: 12px;
+			overflow: hidden;
+			border: 1px solid var(--glass-border);
+		}
+
+		.fit-bar {
+			height: 100%;
+			background: linear-gradient(90deg, #22c55e, #84cc16, #f59e0b);
+			width: 0%;
+			transition: width 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			box-shadow: 0 0 20px currentColor;
+		}
+
+		/* Result Components */
+		.result-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.result-card {
+			background: rgba(255,255,255,0.05);
+			border-radius: 16px;
+			padding: 1.5rem;
+			text-align: center;
+			animation: resultPop 0.6s ease-out;
+		}
+
+		@keyframes resultPop {
+			0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+			100% { transform: scale(1) rotate(0); opacity: 1; }
+		}
+
+		.chip-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+			margin: 1.5rem 0;
+		}
+
+		.chip {
+			padding: 0.5rem 1rem;
+			border-radius: 50px;
+			background: rgba(78, 164, 255, 0.2);
+			border: 1px solid var(--accent);
+			font-size: 0.875rem;
+			font-weight: 600;
+			transition: all 0.3s ease;
+			animation: chipSlide 0.5s ease-out;
+		}
+
+		.chip:hover { transform: scale(1.05); background: var(--accent); }
+
+		@keyframes chipSlide {
+			from { transform: translateX(-20px); opacity: 0; }
+		}
+
+		.output {
+			min-height: 250px;
+			background: rgba(255,255,255,0.03);
+			border-radius: 20px;
+			padding: 2rem;
+			border: 1px solid var(--glass-border);
+			white-space: pre-wrap;
+			overflow: hidden;
+		}
+
+		.skeleton {
+			background: linear-gradient(90deg, #1a2332 25%, #2a3448 50%, #1a2332 75%);
+			background-size: 200% 100%;
+			animation: shimmer 1.5s infinite;
+			border-radius: 8px;
+		}
+
+		@keyframes shimmer {
+			0% { background-position: 200% 0; }
+			100% { background-position: -200% 0; }
+		}
+
+		/* Chatbot Enhanced */
+		.chatbot-toggle {
+			position: fixed;
+			bottom: 2rem;
+			right: 2rem;
+			width: 70px;
+			height: 70px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, var(--accent), #22c55e);
+			border: none;
+			cursor: pointer;
+			box-shadow: var(--shadow-neon);
+			z-index: 1000;
+			animation: pulse 2s infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.1); }
+		}
+
+		.chat-panel {
+			position: fixed;
+			bottom: 100px;
+			right: 2rem;
+			width: 420px;
+			height: 500px;
+			background: var(--glass-bg);
+			backdrop-filter: blur(25px);
+			border-radius: 24px;
+			border: 1px solid var(--glass-border);
+			box-shadow: var(--shadow-neon);
+			transform: scale(0) rotate(-10deg);
+			opacity: 0;
+			transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			z-index: 999;
+			overflow: hidden;
+		}
+
+		.chat-panel.open {
+			transform: scale(1) rotate(0);
+			opacity: 1;
+		}
+
+		.chat-messages {
+			height: 350px;
+			overflow-y: auto;
+			padding: 1.5rem;
+		}
+
+		.chat-bubble {
+			margin-bottom: 1rem;
+			padding: 1rem 1.25rem;
+			border-radius: 20px;
+			max-width: 80%;
+			animation: bubblePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			transform-origin: bottom;
+		}
+
+		@keyframes bubblePop {
+			0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+			50% { transform: scale(1.1); }
+			100% { transform: scale(1) translateY(0); opacity: 1; }
+		}
+
+		.chat-bubble.bot { background: rgba(78, 164, 255, 0.2); margin-left: auto; }
+		.chat-bubble.user { background: rgba(34, 197, 94, 0.3); margin-right: auto; }
+
+		/* Confetti */
+		.confetti {
+			position: fixed;
+			width: 10px;
+			height: 10px;
+			background: #f472b6;
+			pointer-events: none;
+			z-index: 2000;
+			animation: confetti-fall 3s linear forwards;
+		}
+
+		@keyframes confetti-fall {
+			0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+			100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+		}
+
+		@media (max-width: 768px) {
+			.grid { grid-template-columns: 1fr; }
+			.chat-panel { right: 1rem; left: 1rem; width: auto; bottom: 80px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<!-- Particle Canvas -->
+	<canvas id="particles"></canvas>
+
+	<main class="container">
+		<section class="hero">
+			<h1 class="title">🚀 AI Resume Screening</h1>
+			<p class="subtitle">Next-gen AI analyzes resumes with visual feedback, skill matching, and instant recruiter notifications. Upload → Analyze → Hire.</p>
+		</section>
+
+		<section class="grid">
+			<article class="card">
+				<h2>📤 Input</h2>
+				<div class="field">
+					<label for="model">AI Model</label>
+					<select id="model">
+						<option>openai/gpt-4o-mini</option>
+						<option>meta-llama/llama-3.2-3b-instruct:free</option>
+					</select>
+				</div>
+
+				<div class="field">
+					<label for="resumeFile">📎 Upload Resume</label>
+					<input id="resumeFile" type="file" accept=".pdf,.txt,.md" />
+					<small style="color: var(--text-secondary);">PDFs auto-parsed. TXT/MD direct upload.</small>
+				</div>
+
+				<div class="field">
+					<label for="resumeText">📄 Resume Text</label>
+					<textarea id="resumeText" placeholder="Paste or upload resume content..."></textarea>
+				</div>
+
+				<div class="field">
+					<label for="jobDesc">🎯 Job Description (Optional)</label>
+					<textarea id="jobDesc" placeholder="Role requirements for fit analysis..."></textarea>
+				</div>
+
+				<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+					<button id="analyzeBtn" class="btn btn-primary">✨ Analyze Resume</button>
+					<button id="sampleBtn" class="btn btn-ripple">📝 Sample Data</button>
+					<button id="clearBtn" class="btn btn-ripple">🗑️ Clear</button>
+				</div>
+
+				<div id="status" class="status skeleton" style="min-height: 50px;">Initializing...</div>
+			</article>
+
+			<article class="card">
+				<h2>📊 Analysis Results</h2>
+				<div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+					<button id="copyBtn" class="btn btn-ripple">📋 Copy</button>
+				</div>
+
+				<div id="resultSummary" class="result-grid" style="display: none;"></div>
+				
+				<div id="fitMeter" class="field" style="display: none;">
+					<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+						<span>Role Fit Score</span>
+						<span id="fitScore">0/100</span>
+					</div>
+					<div class="fit-meter">
+						<div id="fitBar" class="fit-bar"></div>
+					</div>
+				</div>
+
+				<div id="quickTags" class="chip-row" style="display: none;"></div>
+				
+				<div id="resultBody" class="output skeleton">Analysis loading...</div>
+			</article>
+		</section>
+	</main>
+
+	<!-- Chatbot Toggle -->
+	<button class="chatbot-toggle" id="chatToggle" title="AI Assistant">
+		💬
+	</button>
+
+	<!-- Chat Panel -->
+	<div class="chat-panel" id="chatPanel">
+		<div style="padding: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+			<h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+				🤖 AI Resume Coach
+			</h3>
+			<small style="color: var(--text-secondary);">Ask about optimization, ATS, career tips</small>
+		</div>
+		<div class="chat-messages" id="chatMessages">
+			<div class="chat-bubble bot">Hi! Upload a resume and I'll give instant feedback, ATS tips, and optimization advice. What's your biggest resume challenge?</div>
+		</div>
+		<div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.75rem;">
+			<input id="chatInput" placeholder="Ask me anything..." style="flex: 1; border-radius: 24px; border: 1px solid var(--glass-border); padding: 0.75rem 1rem; background: rgba(255,255,255,0.05);">
+			<button id="chatSend" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.9rem;">Send</button>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+	<script>
+		// Init PDF.js
+		if (window.pdfjsLib) {
+			window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+		}
+
+		// Elements
+		const elements = {
+			model: document.getElementById('model'),
+			resumeFile: document.getElementById('resumeFile'),
+			resumeText: document.getElementById('resumeText'),
+			jobDesc: document.getElementById('jobDesc'),
+			analyzeBtn: document.getElementById('analyzeBtn'),
+			sampleBtn: document.getElementById('sampleBtn'),
+			clearBtn: document.getElementById('clearBtn'),
+			status: document.getElementById('status'),
+			resultSummary: document.getElementById('resultSummary'),
+			fitMeter: document.getElementById('fitMeter'),
+			fitScore: document.getElementById('fitScore'),
+			fitBar: document.getElementById('fitBar'),
+			quickTags: document.getElementById('quickTags'),
+			resultBody: document.getElementById('resultBody'),
+			copyBtn: document.getElementById('copyBtn'),
+			chatToggle: document.getElementById('chatToggle'),
+			chatPanel: document.getElementById('chatPanel'),
+			chatMessages: document.getElementById('chatMessages'),
+			chatInput: document.getElementById('chatInput'),
+			chatSend: document.getElementById('chatSend')
+		};
+
+		let currentResult = null;
+		let isAnalyzing = false;
+
+		// Particle System
+		function initParticles() {
+			const canvas = document.getElementById('particles');
+			const ctx = canvas.getContext('2d');
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			const particles = [];
+			for (let i = 0; i < 50; i++) {
+				particles.push({
+					x: Math.random() * canvas.width,
+					y: Math.random() * canvas.height - canvas.height,
+					size: Math.random() * 3 + 1,
+					speed: Math.random() * 0.5 + 0.2
+				});
+			}
+
+			function animate() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				particles.forEach(p => {
+					ctx.beginPath();
+					ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+					ctx.fillStyle = `rgba(78, 164, 255, ${0.4 - p.y / canvas.height})`;
+					ctx.fill();
+					p.y += p.speed;
+					if (p.y > canvas.height) p.y = -p.size;
+				});
+				requestAnimationFrame(animate);
+			}
+			animate();
+
+			window.addEventListener('resize', () => {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+			});
+		}
+
+		// Scroll Animations
+		function initScrollAnimations() {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('animate');
+					}
+				});
+			}, { threshold: 0.1 });
+
+			document.querySelectorAll('.card').forEach(card => observer.observe(card));
+		}
+
+		// Ripple Effect
+		function createRipple(e) {
+			const button = e.currentTarget;
+			const rect = button.getBoundingClientRect();
+			const size = Math.max(rect.width, rect.height);
+			const x = e.clientX - rect.left - size / 2;
+			const y = e.clientY - rect.top - size / 2;
+
+			const ripple = document.createElement('span');
+			ripple.classList.add('ripple');
+			ripple.style.width = ripple.style.height = size + 'px';
+			ripple.style.left = x + 'px';
+			ripple.style.top = y + 'px';
+			button.appendChild(ripple);
+
+			setTimeout(() => ripple.remove(), 600);
+		}
+
+		// Confetti
+		function launchConfetti(count = 50) {
+			for (let i = 0; i < count; i++) {
+				const confetti = document.createElement('div');
+				confetti.className = 'confetti';
+				confetti.style.left = Math.random() * 100 + 'vw';
+				confetti.style.background = ['#f472b6', '#22c55e', '#4ea4ff', '#eab308'][Math.floor(Math.random() * 4)];
+				confetti.style.animationDelay = Math.random() * 0.2 + 's';
+				confetti.style.animationDuration = (Math.random() * 1 + 2) + 's';
+				document.body.appendChild(confetti);
+				setTimeout(() => confetti.remove(), 3000);
+			}
+		}
+
+		// Status Updates
+		function setStatus(message, type = '') {
+			elements.status.className = 'status';
+			elements.status.innerHTML = message;
+			if (type === 'success') launchConfetti();
+		}
+
+		// Sample Data
+		elements.sampleBtn.onclick = () => {
+			elements.resumeText.value = `Aarav Mehta
+Senior Backend Engineer | 5+ Yrs Exp
+
+EXPERIENCE
+RecruitmentFlow Inc. (2021-Present)
+• Architected AI resume screening platform (50K users, 99.9% uptime)
+• Node.js/Express APIs serving 10K req/min with Redis caching
+• PostgreSQL optimization: 300% query speed improvement
+• Docker/K8s deployment on AWS (cost ↓40%)
+
+SKILLS
+Node.js • Express • PostgreSQL • Redis • Docker • AWS
+REST/GraphQL • Microservices • CI/CD • TypeScript`;
+			
+			elements.jobDesc.value = `SENIOR BACKEND ENGINEER
+Must have: Node.js (4+ yrs), PostgreSQL, AWS/Docker, API design
+Bonus: GraphQL, Redis, Kubernetes, TypeScript`;
+			setStatus('🎯 Sample data loaded! Click Analyze.');
+		};
+
+		// Analyze Resume (Enhanced with skeleton)
+		elements.analyzeBtn.onclick = async () => {
+			if (isAnalyzing) return;
+			
+			const resumeText = elements.resumeText.value.trim();
+			if (!resumeText) {
+				setStatus('📄 Please add resume text first!', 'error');
+				return;
+			}
+
+			isAnalyzing = true;
+			elements.analyzeBtn.disabled = true;
+			setStatus('✨ AI analyzing resume...', 'loading');
+			
+			// Skeleton animation
+			elements.resultBody.classList.add('skeleton');
+			elements.resultSummary.style.display = 'none';
+			elements.fitMeter.style.display = 'none';
+
+			try {
+				const response = await fetch('http://localhost:3000/api/analyze', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: elements.model.value,
+						resumeText,
+						jobDesc: elements.jobDesc.value.trim()
+					})
+				});
+
+				const data = await response.json();
+				if (!response.ok) throw new Error(data.error || 'Analysis failed');
+
+				const parsed = JSON.parse(data.content);
+				currentResult = parsed;
+				
+				renderResults(parsed);
+				setStatus('✅ Analysis complete!', 'success');
+			} catch (error) {
+				setStatus(`❌ ${error.message}`, 'error');
+			} finally {
+				isAnalyzing = false;
+				elements.analyzeBtn.disabled = false;
+				elements.resultBody.classList.remove('skeleton');
+			}
+		};
+
+		// Render Results with Animations
+		function renderResults(parsed) {
+			const score = parsed.overallScore || 0;
+			
+			// Summary Cards
+			elements.resultSummary.innerHTML = `
+				<div class="result-card">
+					<div style="color: var(--text-secondary); font-size: 0.875rem;">Score</div>
+					<div style="font-size: 2.5rem; font-weight: 800;">${score}</div>
+				</div>
+				<div class="result-card">
+					<div style="color: var(--text-secondary); font-size: 0.875rem;">Status</div>
+					<div style="font-size: 1.2rem;">${parsed.recommendation}</div>
+				</div>
+			`;
+			elements.resultSummary.style.display = 'grid';
+
+			// Fit Meter Animation
+			elements.fitScore.textContent = `${Math.round(score)}/100`;
+			elements.fitBar.style.width = `${Math.min(100, score)}%`;
+			elements.fitMeter.style.display = 'block';
+
+			// Quick Tags
+			const tags = [];
+			if (score >= 80) tags.push('🎯 Hire Priority');
+			if (parsed.matchedSkills?.length > 3) tags.push('✅ Strong Match');
+			if (parsed.missingSkills?.length > 2) tags.push('⚠️ Skill Gaps');
+			
+			elements.quickTags.innerHTML = tags.map(tag => `<span class="chip">${tag}</span>`).join('');
+			elements.quickTags.style.display = tags.length ? 'flex' : 'none';
+
+			// Result Body
+			elements.resultBody.innerHTML = `
+				<h3 style="margin: 0 0 1rem;">📋 Key Insights</h3>
+				${parsed.summary ? `<p style="margin-bottom: 1.5rem;">${parsed.summary}</p>` : ''}
+				<div style="display: grid; gap: 1rem;">
+					${parsed.matchedSkills?.length ? `<div><strong>✅ Matched Skills:</strong><br>${parsed.matchedSkills.slice(0,5).join(', ')}</div>` : ''}
+					${parsed.improvementSuggestions?.length ? `<div><strong>💡 Improvements:</strong><ul>${parsed.improvementSuggestions.slice(0,5).map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
+					${parsed.interviewQuestions?.length ? `<div><strong>❓ Interview Questions:</strong><ul>${parsed.interviewQuestions.slice(0,3).map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
+				</div>
+			`;
+		}
+
+		// Copy Results
+		elements.copyBtn.onclick = async () => {
+			const text = elements.resultBody.textContent;
+			if (!text) return setStatus('No results to copy');
+			
+			try {
+				await navigator.clipboard.writeText(text);
+				setStatus('📋 Copied to clipboard!');
+			} catch {
+				setStatus('Copy failed - select text manually');
+			}
+		};
+
+		// Chatbot
+		elements.chatToggle.onclick = () => elements.chatPanel.classList.toggle('open');
+		elements.chatSend.onclick = sendChatMessage;
+		elements.chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
+
+		async function sendChatMessage() {
+			const msg = elements.chatInput.value.trim();
+			if (!msg) return;
+
+			addChatMessage(msg, 'user');
+			elements.chatInput.value = '';
+
+			// Simulate typing
+			const typingBubble = addChatMessage('Typing...', 'bot');
+			try {
+				const res = await fetch('http://localhost:3000/api/chat', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ message: msg, resumeText: elements.resumeText.value })
+				});
+				const data = await res.json();
+				typingBubble.remove();
+				addChatMessage(data.reply, 'bot');
+			} catch {
+				typingBubble.textContent = 'Oops! Chat service unavailable.';
+			}
+		}
+
+		function addChatMessage(text, type) {
+			const bubble = document.createElement('div');
+			bubble.className = `chat-bubble ${type}`;
+			bubble.textContent = text;
+			elements.chatMessages.appendChild(bubble);
+			elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+			return bubble;
+		}
+
+		// File Upload + PDF Parse
+		elements.resumeFile.onchange = async (e) => {
+			const file = e.target.files[0];
+			if (!file) return;
+
+			setStatus('📖 Parsing document...');
+			try {
+				let text = '';
+				if (file.name.match(/\.(pdf)$/i)) {
+					const arrayBuffer = await file.arrayBuffer();
+					const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+					for (let i = 1; i <= pdf.numPages; i++) {
+						const page = await pdf.getPage(i);
+						const content = await page.getTextContent();
+						text += content.items.map(item => item.str).join(' ') + '\n\n';
+					}
+				} else {
+					text = await file.text();
+				}
+				elements.resumeText.value = text;
+				setStatus(`✅ Loaded ${file.name}`);
+			} catch (err) {
+				setStatus(`❌ Parse failed: ${err.message}`);
+			}
+		};
+
+		// Clear
+		elements.clearBtn.onclick = () => {
+			Object.values(elements).forEach(el => {
+				if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
+				if (el.id === 'resumeFile') el.value = null;
+			});
+			elements.resultSummary.style.display = 'none';
+			elements.fitMeter.style.display = 'none';
+			elements.quickTags.style.display = 'none';
+			setStatus('🧹 Cleared!');
+		};
+
+		// Init
+		initParticles();
+		initScrollAnimations();
+		document.querySelectorAll('.btn-ripple').forEach(btn => {
+			btn.onmousedown = createRipple;
+		});
+
+		// File drag & drop
+		document.addEventListener('dragover', e => e.preventDefault());
+		document.addEventListener('drop', e => {
+			e.preventDefault();
+			const file = e.dataTransfer.files[0];
+			if (file && elements.resumeFile.accept.split(',').some(type => file.type.includes(type))) {
+				elements.resumeFile.files = e.dataTransfer.files;
+				elements.resumeFile.dispatchEvent(new Event('change'));
+			}
+		});
+	</script>
+</body>
+</html>
+
