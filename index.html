@@ -513,6 +513,14 @@
 			window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 		}
 
+		// Get API Base URL - works on localhost, mobile, and other devices
+		const getApiUrl = (endpoint) => {
+			const protocol = window.location.protocol; // http: or https:
+			const hostname = window.location.hostname;
+			const port = 3000;
+			return `${protocol}//${hostname}:${port}${endpoint}`;
+		};
+
 		// Elements
 		const elements = {
 			model: document.getElementById('model'),
@@ -671,7 +679,7 @@ Bonus: GraphQL, Redis, Kubernetes, TypeScript`;
 			elements.fitMeter.style.display = 'none';
 
 			try {
-				const response = await fetch('http://localhost:3000/api/analyze', {
+				const response = await fetch(getApiUrl('/api/analyze'), {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
@@ -769,7 +777,7 @@ Bonus: GraphQL, Redis, Kubernetes, TypeScript`;
 			// Simulate typing
 			const typingBubble = addChatMessage('Typing...', 'bot');
 			try {
-				const res = await fetch('http://localhost:3000/api/chat', {
+				const res = await fetch(getApiUrl('/api/chat'), {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ message: msg, resumeText: elements.resumeText.value })
