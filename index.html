@@ -364,9 +364,12 @@
 		}
 
 		.chat-messages {
-			height: 350px;
+			height: 380px;
 			overflow-y: auto;
 			padding: 1.5rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
 		}
 
 		.chat-bubble {
@@ -384,8 +387,8 @@
 			100% { transform: scale(1) translateY(0); opacity: 1; }
 		}
 
-		.chat-bubble.bot { background: rgba(78, 164, 255, 0.2); margin-left: auto; }
-		.chat-bubble.user { background: rgba(34, 197, 94, 0.3); margin-right: auto; }
+		.chat-bubble.bot { background: rgba(78, 164, 255, 0.2); margin-right: auto; text-align: left; }
+		.chat-bubble.user { background: rgba(34, 197, 94, 0.3); margin-left: auto; text-align: right; }
 
 		/* Confetti */
 		.confetti {
@@ -405,7 +408,9 @@
 
 		@media (max-width: 768px) {
 			.grid { grid-template-columns: 1fr; }
-			.chat-panel { right: 1rem; left: 1rem; width: auto; bottom: 80px; }
+			.chat-panel { right: 1rem; left: 1rem; width: calc(100% - 2rem); bottom: 80px; height: 450px; }
+			.chat-input-box { padding: 0.75rem; }
+			#chatInput { font-size: 16px; }
 		}
 
 		@media (prefers-reduced-motion: reduce) {
@@ -500,9 +505,9 @@
 		<div class="chat-messages" id="chatMessages">
 			<div class="chat-bubble bot">Hi! Upload a resume and I'll give instant feedback, ATS tips, and optimization advice. What's your biggest resume challenge?</div>
 		</div>
-		<div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.75rem;">
-			<input id="chatInput" placeholder="Ask me anything..." style="flex: 1; border-radius: 24px; border: 1px solid var(--glass-border); padding: 0.75rem 1rem; background: rgba(255,255,255,0.05);">
-			<button id="chatSend" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.9rem;">Send</button>
+		<div class="chat-input-box" style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem; align-items: stretch; min-height: 50px;">
+			<input id="chatInput" placeholder="Ask me anything..." style="flex: 1; border-radius: 12px; border: 1px solid var(--glass-border); padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); font-size: 0.95rem; color: var(--text-primary);">
+			<button id="chatSend" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.9rem; min-width: 70px; white-space: nowrap; font-weight: 600;">➤ Send</button>
 		</div>
 	</div>
 
@@ -709,6 +714,7 @@ Bonus: GraphQL, Redis, Kubernetes, TypeScript`;
 		// Render Results with Animations
 		function renderResults(parsed) {
 			const score = parsed.overallScore || 0;
+			const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 			
 			// Summary Cards
 			elements.resultSummary.innerHTML = `
@@ -737,16 +743,25 @@ Bonus: GraphQL, Redis, Kubernetes, TypeScript`;
 			elements.quickTags.innerHTML = tags.map(tag => `<span class="chip">${tag}</span>`).join('');
 			elements.quickTags.style.display = tags.length ? 'flex' : 'none';
 
-			// Result Body
-			elements.resultBody.innerHTML = `
-				<h3 style="margin: 0 0 1rem;">📋 Key Insights</h3>
-				${parsed.summary ? `<p style="margin-bottom: 1.5rem;">${parsed.summary}</p>` : ''}
-				<div style="display: grid; gap: 1rem;">
-					${parsed.matchedSkills?.length ? `<div><strong>✅ Matched Skills:</strong><br>${parsed.matchedSkills.slice(0,5).join(', ')}</div>` : ''}
-					${parsed.improvementSuggestions?.length ? `<div><strong>💡 Improvements:</strong><ul>${parsed.improvementSuggestions.slice(0,5).map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
-					${parsed.interviewQuestions?.length ? `<div><strong>❓ Interview Questions:</strong><ul>${parsed.interviewQuestions.slice(0,3).map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
-				</div>
-			`;
+			// Result Body - Show full details only on localhost
+			if (isLocalhost) {
+				elements.resultBody.innerHTML = `
+					<h3 style="margin: 0 0 1rem;">📋 Key Insights</h3>
+					${parsed.summary ? `<p style="margin-bottom: 1.5rem;">${parsed.summary}</p>` : ''}
+					<div style="display: grid; gap: 1rem;">
+						${parsed.matchedSkills?.length ? `<div><strong>✅ Matched Skills:</strong><br>${parsed.matchedSkills.slice(0,5).join(', ')}</div>` : ''}
+						${parsed.improvementSuggestions?.length ? `<div><strong>💡 Improvements:</strong><ul>${parsed.improvementSuggestions.slice(0,5).map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
+						${parsed.interviewQuestions?.length ? `<div><strong>❓ Interview Questions:</strong><ul>${parsed.interviewQuestions.slice(0,3).map(q => `<li>${q}</li>`).join('')}</ul></div>` : ''}
+					</div>
+				`;
+			} else {
+				// On other devices, show only summary
+				elements.resultBody.innerHTML = `
+					<h3 style="margin: 0 0 1rem;">📋 Summary</h3>
+					${parsed.summary ? `<p style="margin-bottom: 1.5rem; line-height: 1.6;">${parsed.summary}</p>` : ''}
+					<p style="color: var(--text-secondary); font-size: 0.9rem; font-style: italic;">📱 For detailed analysis, please use the desktop version.</p>
+				`;
+			}
 		}
 
 		// Copy Results
