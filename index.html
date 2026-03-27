@@ -154,6 +154,14 @@
 			position: relative;
 		}
 
+		.field:has(#model) {
+			display: none !important;
+		}
+
+		#model {
+			display: none !important;
+		}
+
 		input, textarea, select {
 			width: 100%;
 			border: 2px solid transparent;
